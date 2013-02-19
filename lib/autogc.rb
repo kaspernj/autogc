@@ -3,9 +3,19 @@ class Autogc
   #Disables the normal GC and enables a timeout to automatically GC.
   def initialize(args = {})
     @args = args
+    
+    puts "Starting Autogc." if @args[:debug]
     @args[:time] = 1
     @thread = Thread.new(&self.method(:gc_loop))
     GC.disable
+  end
+  
+  #Starts autogc if it is running on a known buggy environment.
+  def self.enable_for_known_buggy_env(args = {})
+    found = false
+    found = true if RUBY_VERSION == "1.9.3"
+    Autogc.new(args) if found
+    return found
   end
   
   #Stops the garbage-collection on time and enables the normal GC.
